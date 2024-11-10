@@ -125,9 +125,12 @@ def train_quantum_dqn(env, epsilon, epsilon_decay, num_episodes, replay_buffer, 
         state, info = env.reset()
         state = torch.FloatTensor(state).unsqueeze(0).to(device)
         total_reward = 0
+
+        if (episode % 10 == 0):
+            print("episode %f  Current Mean Reward: %f", episode, mean_reward_list)
         
         # Inner loop for steps within each episode
-        for t in range(1, 10000):
+        for t in range(1, 1000):
             # Epsilon-greedy action selection
             if random.random() > epsilon:
                 with torch.no_grad():
