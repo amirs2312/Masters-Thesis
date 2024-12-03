@@ -123,11 +123,10 @@ def train_quantum_dqn(env, epsilon, epsilon_decay, num_episodes, replay_buffer, 
     for episode in range(num_episodes):
         # Reset environment and convert initial state to tensor
         state, info = env.reset()
-        state = torch.FloatTensor(state).unsqueeze(0).to(device)
+        state = torch.FloatTensor(state).unsqueeze(0)
         total_reward = 0
 
-        if (episode % 10 == 0):
-            print("episode %f  Current Mean Reward: %f", episode, mean_reward_list)
+        
         
         # Inner loop for steps within each episode
         for t in range(1, 1000):
@@ -148,7 +147,7 @@ def train_quantum_dqn(env, epsilon, epsilon_decay, num_episodes, replay_buffer, 
             # Step in environment
             next_state, reward, terminated, truncated, info = env.step(action)
             done = terminated or truncated
-            next_state = torch.FloatTensor(next_state).unsqueeze(0).to(device)
+            next_state = torch.FloatTensor(next_state).unsqueeze(0)
             total_reward += reward
             
             # Store transition in replay buffer
@@ -162,11 +161,11 @@ def train_quantum_dqn(env, epsilon, epsilon_decay, num_episodes, replay_buffer, 
                 batch_state, batch_action, batch_reward, batch_next_state, batch_done = zip(*transitions)
 
                 # Convert batches to tensors and ensure compatibility with the device
-                batch_state = torch.cat(batch_state).to(device)          
-                batch_next_state = torch.cat(batch_next_state).to(device)
-                batch_action = torch.tensor(batch_action, dtype=torch.long).unsqueeze(1).to(device)
-                batch_reward = torch.tensor(batch_reward, dtype=torch.float).unsqueeze(1).to(device)
-                batch_done = torch.tensor(batch_done, dtype=torch.float).unsqueeze(1).to(device)
+                batch_state = torch.cat(batch_state).to("cpu")         
+                batch_next_state = torch.cat(batch_next_state)
+                batch_action = torch.tensor(batch_action, dtype=torch.long).unsqueeze(1)
+                batch_reward = torch.tensor(batch_reward, dtype=torch.float).unsqueeze(1)
+                batch_done = torch.tensor(batch_done, dtype=torch.float).unsqueeze(1)
 
                 # Forward pass through the quantum live model for Q-values
                 q_values = live_qmodel(batch_state).gather(1, batch_action)
@@ -198,6 +197,8 @@ def train_quantum_dqn(env, epsilon, epsilon_decay, num_episodes, replay_buffer, 
         rewards_list.append(total_reward)
         mean_reward = np.mean(rewards_list)
         mean_reward_list.append(mean_reward)
+        if (episode % 10 == 0):
+            print("episode", episode, "Current Mean Reward: ", mean_reward)
     
     # Plotting training progress
         ax.clear()
