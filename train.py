@@ -105,6 +105,8 @@ def train_DQN(env, epsilon, epsilon_decay, num_episodes, replay_buffer, batch_si
     plt.ioff()
     plt.show()
 
+    return mean_reward_list
+
 
 
 
@@ -214,3 +216,5 @@ def train_quantum_dqn(env, epsilon, epsilon_decay, num_episodes, replay_buffer, 
     # Disable interactive mode and show the final plot
     plt.ioff()
     plt.show()
+
+    return mean_reward_list
